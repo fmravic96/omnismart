@@ -1,0 +1,72 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.2/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.2/ext-language_tools.js"></script>
+    <link rel="stylesheet" type="text/css" href="./style.css">
+</head>
+<body onload="ready()">
+    <div id="container">
+        <div id="editor">
+        </div>
+        <iframe id="iframe" frameborder="0"></iframe>
+    </div>
+
+    <script>
+        function update(){
+            var idoc = document.getElementById('iframe').contentWindow.document;
+            idoc.open();
+            idoc.write(editor.getValue());
+            idoc.close();
+        }
+
+        function setupEditor(){
+            window.editor = ace.edit("editor");
+            editor.setTheme("ace/theme/merbivore");
+            editor.getSession().setMode("ace/mode/html");
+            editor.setValue(`<!DOCTYPE html>
+<html>
+
+<head>
+</head>
+
+<body>
+</body>
+
+</html>`,1); //1 = moves cursor to end
+
+            editor.getSession().on('change', function() {
+                update();
+            });
+
+            editor.focus();
+            
+            
+            editor.setOptions({
+                fontSize: "16pt",
+                vScrollBarAlwaysVisible:true,
+                enableBasicAutocompletion: true, 
+                enableLiveAutocompletion: true,
+                enableSnippets: true
+            });
+
+            editor.commands.on("afterExec", function(e){
+                if(e.command.name == "insertstring"&&/^[\<.]$/.test(e.args)){
+                    editor.execCommand("startAutocomplete")
+                }
+            });
+
+            editor.setShowPrintMargin(false);
+            editor.setBehavioursEnabled(false);
+            }
+
+        function ready(){
+            setupEditor();
+            update();
+        }
+    </script>
+</body>
+</html>
